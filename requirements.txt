@@ -5,6 +5,4 @@ numpy==1.24.0
 pydantic==2.3.0
 pydantic-core==2.6.3
 pydantic-settings==2.0.3
-transformers
-huggingface-hub==0.23.4
-llama-index==0.9.27
+transformers==4.34.0
