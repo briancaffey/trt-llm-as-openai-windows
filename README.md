@@ -26,7 +26,7 @@ Download models and quantized weights
   * CodeLlama-13B-instruct AWQ int
     * Download CodeLlama 13B model from [CodeLlama-13b-Instruct-hf](https://huggingface.co/codellama/CodeLlama-13b-Instruct-hf)
     * Download CodeLlama 13B AWQ int4 checkpoints from [here](https://catalog.ngc.nvidia.com/orgs/nvidia/models/code_llama/files?version=1.1)
-  * Llama-2-13b-chat AWQ int4 
+  * Llama-2-13b-chat AWQ int4
     * Download Llama-2-13b-chat model from [Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf)
     * Download Llama-2-13b-chat AWQ int4 checkpoints from [here](https://catalog.ngc.nvidia.com/orgs/nvidia/models/llama2-13b/files?version=1.3)
 
@@ -46,7 +46,7 @@ python build.py --model_dir <path to llama13_chat model> --quant_ckpt_path <path
 
 <h3 id="setup"> Setup Steps </h3>
 
-1. Clone this repository: 
+1. Clone this repository:
    ```
    https://github.com/NVIDIA/trt-llm-as-openai-windows
    cd trt-llm-as-openai-windows
@@ -55,7 +55,7 @@ python build.py --model_dir <path to llama13_chat model> --quant_ckpt_path <path
    - [CodeLlama-13b-Instruct-hf](https://huggingface.co/codellama/CodeLlama-13b-Instruct-hf/tree/main)
    - [Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf/tree/main).
 3. Build the TRT engine by following the instructions provided [here](#building-trt-engine) and place the TensorRT engine files for the Llama2/CodeLlama model in the 'model/engine' directory
-4. Install the necessary libraries: 
+4. Install the necessary libraries:
    ```
    pip install -r requirements.txt
    ```
@@ -65,7 +65,7 @@ python build.py --model_dir <path to llama13_chat model> --quant_ckpt_path <path
    ```
    python app.py --trt_engine_path <TRT Engine folder> --trt_engine_name <TRT Engine file>.engine --tokenizer_dir_path <tokernizer folder> --port <optional port>
    ```
-   
+
    - CodeLlama-13B-instruct model needs additional parameter mentioned below to the command above :
    ```
    --no_system_prompt True
@@ -81,21 +81,21 @@ python build.py --model_dir <path to llama13_chat model> --quant_ckpt_path <path
    ```
    pip install openai==0.28
    ```
-  
+
 2. Run the following code inside your Python env.
-   
+
 3. Set a random API key and the base URL.
 <pre>
-openai.api_key="ABC"  
+openai.api_key="ABC"
 openai.api_base="http://127.0.0.1:8081"
 response = openai.ChatCompletion.create(
   model = "Llama2",
   prompt = "Hello! How are you?")
 print(response)
 </pre>
-   
 
-## Detailed Command References 
+
+## Detailed Command References
 ```
 python app.py --trt_engine_path <TRT Engine folder> --trt_engine_name <TRT Engine file>.engine --tokenizer_dir_path <tokernizer folder> --port <port>
 ```
@@ -110,7 +110,7 @@ Arguments
 | --port <>               | OpenAI compatible server hosted on localhost and 8081 port as default. Optionally, allows to specify a different port.  |
 | --max_output_tokens     | Optional override to maximum output token sizes otherwise it defaults to 2048 |
 | --max_input_tokens      | Optional override to maximum input token sizes otherwise it defaults to 2048 |
-| --no_system_prompt      | App uses default system prompt and optionally supported to avoid it. | 
+| --no_system_prompt      | App uses default system prompt and optionally supported to avoid it. |
 
 
 <h3 id="supported-apis">Supported APIs</h3>
@@ -132,7 +132,7 @@ Arguments
    4. Expand "Advanced (optional)"
       1. apiBase: update to local host url like ```http://localhost:8081/v1```
       2. update contextLength: ```16384```
-   5. Select CodeLlama 13b instruct option 
+   5. Select CodeLlama 13b instruct option
 4. Alternatively config.json can be modified directly to include below
    1. Open ```c:\users\<user>\.continue\config.json``` in any editor
    2. Add below model config
