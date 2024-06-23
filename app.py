@@ -22,11 +22,8 @@
 import argparse
 
 from flask import Flask, Response, request, jsonify
-# from trt_llama_api_chatrtx import TrtLlmAPI
-from trt_llama_api_chatrtx import TrtLlmAPI
-from trt_llama_api import make_resData
+from trt_llama_api import TrtLlmAPI
 from utils import messages_to_prompt, completion_to_prompt, ChatMessage, MessageRole, DEFAULT_SYSTEM_PROMPT
-from llama_index.llms.llama_utils import messages_to_prompt as m_to_p, completion_to_prompt as c_to_p
 
 # Create an argument parser
 parser = argparse.ArgumentParser(description='OpenAI Compatible Server')
@@ -75,29 +72,24 @@ port = args.port
 no_system_prompt = args.no_system_prompt
 
 # create trt_llm engine object
-# NOTE: this TrtLlmAPI is borrowed from NVIDIA/ChatRTX
 llm = TrtLlmAPI(
     model_path=trt_engine_path,
     engine_name=trt_engine_name,
     tokenizer_dir=tokenizer_dir_path,
-    temperature=0.7,
-    max_new_tokens=1024, #args.max_output_tokens,
-    context_window=1024, # args.max_input_tokens,
-    messages_to_prompt=m_to_p,
-    completion_to_prompt=c_to_p,
-    vocab_file=None,
-    use_py_session=True,
-    add_special_tokens=False,
-    trtLlm_debug_mode=False,
+    temperature=0.1,
+    max_new_tokens=args.max_output_tokens,
+    context_window=args.max_input_tokens,
+    messages_to_prompt=messages_to_prompt,
+    completion_to_prompt=completion_to_prompt,
     verbose=False
 )
 
 
-@app.route('/models/Llama3', methods=['POST', 'GET'])
-@app.route('/v1/models/Llama3', methods=['POST', 'GET'])
+@app.route('/models/Llama2', methods=['POST', 'GET'])
+@app.route('/v1/models/Llama2', methods=['POST', 'GET'])
 def models():
     resData = {
-        "id": "Llama3",
+        "id": "Llama2",
         "object": "model",
         "created": 1675232119,
         "owned_by": "Meta"
@@ -112,7 +104,7 @@ def modelsLlaMA():
         "object": "list",
         "data": [
             {
-                "id": "Llama3",
+                "id": "Llama2",
                 "object": "model",
                 "created": 1675232119,
                 "owned_by": "Meta"
@@ -162,8 +154,8 @@ def chat_completions():
         system_prompt = ""
         if not no_system_prompt:
             system_prompt = DEFAULT_SYSTEM_PROMPT
-        # commenting this out because messages_to_prompt is handled in the new TrtLlmAPI below (llm.chat)
-        # prompt = messages_to_prompt(messages, system_prompt)
+
+        prompt = messages_to_prompt(messages, system_prompt)
 
         formatted = True
     elif "prompt" in body:
@@ -174,19 +166,8 @@ def chat_completions():
         print("INPUT: " + prompt)
 
     if not stream:
-        resp = llm.chat(messages)
-        thisdict = dict(truncated=False,
-                        prompt_tokens=999, #input_ids.shape[1],
-                        completion_tokens=999, #len(output_token_ids),
-                        content=resp.raw["choices"][0]["text"],
-                        stopped=False,
-                        slot_id=1,
-                        stop=True)
-
-        resData = make_resData(thisdict, chat=chat)
-        return jsonify(resData)
+        return llm.complete_common(prompt, True, temperature=temperature, formatted=formatted)
     else:
-        # TODO: implement streaming
         return llm.stream_complete_common(prompt, True, temperature=temperature, formatted=formatted)
 
 
