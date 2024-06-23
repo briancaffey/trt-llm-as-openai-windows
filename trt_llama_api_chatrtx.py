@@ -175,8 +175,6 @@ class TrtLlmAPI(CustomLLM):
     @llm_chat_callback()
     def chat(self, messages: Sequence[ChatMessage], **kwargs: Any) -> ChatResponse:
         prompt = messages_to_prompt_v3_instruct(messages)
-        print("Formatting of messages to prompt")
-        print(prompt)
         completion_response = self.complete(prompt, formatted=True, **kwargs)
         return completion_response_to_chat_response(completion_response)
 
@@ -252,8 +250,36 @@ class TrtLlmAPI(CustomLLM):
         # call garbage collected after inference
         torch.cuda.empty_cache()
         gc.collect()
-        return CompletionResponse(text=output_txt, raw=self.generate_completion_dict(output_txt))
 
+        # print("output_token_ids")
+        # print(output_token_ids)
+        # print(output_token_ids.size(1))
+        # print()
+
+        # print("input_lengths")
+        # print(input_lengths)
+        # print()
+
+        # print("sequence_lengths")
+        # print(sequence_lengths)
+        # print()
+
+        print("Output Text:")
+        print(output_txt)
+
+        return CompletionResponse(
+            text=output_txt,
+            raw=self.generate_completion_dict(output_txt),
+            # TODO: clean this up once I figure out what is needed
+            additional_kwargs={
+                "output_length": len(output_ids),
+                "output_ids": output_ids,
+                "input_lengths": input_lengths,
+                "output_token_ids": output_token_ids,
+                "sequence_lengths": sequence_lengths
+            })
+
+    # TODO: implement this for llama3
     @llm_completion_callback()
     def stream_complete(self, prompt: str, **kwargs: Any) -> CompletionResponseGen:
         is_formatted = kwargs.pop("formatted", False)

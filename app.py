@@ -80,9 +80,9 @@ llm = TrtLlmAPI(
     model_path=trt_engine_path,
     engine_name=trt_engine_name,
     tokenizer_dir=tokenizer_dir_path,
-    temperature=0.1,
-    max_new_tokens=200, #args.max_output_tokens,
-    context_window=200, # args.max_input_tokens,
+    temperature=0.7,
+    max_new_tokens=1024, #args.max_output_tokens,
+    context_window=1024, # args.max_input_tokens,
     messages_to_prompt=m_to_p,
     completion_to_prompt=c_to_p,
     vocab_file=None,
@@ -139,7 +139,6 @@ def chat_completions():
 
     prompt = ""
     if "messages" in body:
-        print("messages are in body...")
         messages = []
         for item in body["messages"]:
             chat = ChatMessage()
@@ -176,12 +175,10 @@ def chat_completions():
 
     if not stream:
         resp = llm.chat(messages)
-        print(resp.additional_kwargs)
-        print(resp)
         thisdict = dict(truncated=False,
                         prompt_tokens=999, #input_ids.shape[1],
                         completion_tokens=999, #len(output_token_ids),
-                        content=str(resp),
+                        content=resp.raw["choices"][0]["text"],
                         stopped=False,
                         slot_id=1,
                         stop=True)
@@ -189,6 +186,7 @@ def chat_completions():
         resData = make_resData(thisdict, chat=chat)
         return jsonify(resData)
     else:
+        # TODO: implement streaming
         return llm.stream_complete_common(prompt, True, temperature=temperature, formatted=formatted)
 
 
